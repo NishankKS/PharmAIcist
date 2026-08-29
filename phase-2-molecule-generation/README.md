@@ -1,10 +1,13 @@
-# Phase II — Enhanced Molecular Generation
+# ⚗️ Phase II: Enhanced Molecular Generation
 
 Generates novel drug-like molecules biased toward high predicted potency against **acetylcholinesterase**. Where Phase I scores compounds that already exist, this stage invents new ones.
 
 Built on the **ReLeaSE** framework (Reinforcement Learning for Structural Evolution, Popova, Isayev & Tropsha, *Science Advances* 2018).
 
-> This phase was published as a Springer conference paper.
+## 📄 Publication
+
+This phase was published at ICICV 2024.
+
 > Satish, N., Bukapindi, M., K, S., Akhil, G., Malagi, V.P. (2024).
 > *Innovating Drug Design for Alzheimer's Disease via Reinforcement Learning for Enhanced Molecular Generation.*
 > In: Roy, S., Sinwar, D., Dey, N., Perumal, T., R. S. Tavares, J.M. (eds)
@@ -12,7 +15,7 @@ Built on the **ReLeaSE** framework (Reinforcement Learning for Structural Evolut
 > Lecture Notes in Networks and Systems, vol 1117. Springer, Singapore.
 > [https://doi.org/10.1007/978-981-97-6992-6_20](https://doi.org/10.1007/978-981-97-6992-6_20)
 
-## How it works
+## 🔬 How it works
 
 Two networks, trained separately, then coupled through reinforcement learning:
 
@@ -37,18 +40,18 @@ Two objectives are explored, one per notebook:
 
 | Notebook | Objective |
 |---|---|
-| `ReinlogP.ipynb` | Optimise toward a target logP range (drug-likeness / lipophilicity) |
+| `ReinlogP.ipynb` | Optimise toward a target logP range (drug-likeness and lipophilicity) |
 | `ReinMinMax.ipynb` | Maximise and minimise pIC50, to show the reward genuinely steers generation |
 
-## Results
+## 📊 Results
 
-- **84% of generated strings are valid SMILES.**
-- **Mean Tanimoto similarity 0.70** against known AChE-active molecules in the [Polypharmacology Browser 2 (PPB2)](https://ppb2.gdb.tools/). The closest match is CHEMBL59782 at 0.71.
-- The pIC50 distribution shifts from the training data's dense band around **4–6** into **10–12** for generated molecules.
+- ✅ **84% of generated strings are valid SMILES.**
+- 🔗 **Mean Tanimoto similarity 0.70** against known AChE-active molecules in the [Polypharmacology Browser 2 (PPB2)](https://ppb2.gdb.tools/). The closest match is CHEMBL59782 at 0.71.
+- 📈 The pIC50 distribution shifts from the training data's dense band around **4 to 6** into **10 to 12** for generated molecules.
 
-That last point needs context — see limitations below.
+That last point needs context. See limitations below.
 
-## Contents
+## 📁 Contents
 
 ```
 ReinlogP.ipynb        RL optimisation toward target logP
@@ -63,13 +66,12 @@ Output/
   output.txt          Generated SMILES with predicted pIC50
 ```
 
-## Setup
+## ⚙️ Setup
 
 The notebooks import `stackRNN`, `data`, `predictor` and related modules **from the ReLeaSE repository, not from this folder.** Clone it as a sibling directory:
 
 ```bash
 git clone https://github.com/isayev/ReLeaSE.git
-cd ReLeaSE
 ```
 
 Then create the environment:
@@ -81,28 +83,28 @@ conda install -c rdkit rdkit -y
 pip install torch numpy pandas scikit-learn matplotlib seaborn mordred tqdm jupyter
 ```
 
-Point the notebooks at the ReLeaSE `release/` directory — the committed cells contain absolute paths from the original author's machine (`~/manikanta/ReLeaSE/release/`), so adjust the `sys.path.append` calls before running.
+⚠️ Point the notebooks at the ReLeaSE `release/` directory. The committed cells contain absolute paths from the original author's machine (`~/manikanta/ReLeaSE/release/`), so adjust the `sys.path.append` calls before running.
 
-A CUDA GPU is strongly recommended:
+🖥️ A CUDA GPU is strongly recommended:
 
 ```bash
 export CUDA_VISIBLE_DEVICES=0
 jupyter notebook
 ```
 
-## Data
+## 🗂️ Data
 
-`Assets/data/data_train.txt` holds the SMILES corpus used for generator pretraining, drawn from ChEMBL. The dataset skews toward molecules of 30–40 atoms, single and aromatic bonds (order 1.0 and 1.5), and is carbon-dominated — the elemental distribution plots in `Assets/images/` show this.
+`Assets/data/data_train.txt` holds the SMILES corpus used for generator pretraining, drawn from ChEMBL. The dataset skews toward molecules of 30 to 40 atoms, single and aromatic bonds (order 1.0 and 1.5), and is carbon-dominated. The elemental distribution plots in `Assets/images/` show this.
 
-## Limitations
+## ⚠️ Limitations
 
-**Predicted pIC50 above ~12 is reward hacking, not chemistry.** The generator is optimised against the Phase I Random Forest, which was trained on a pIC50 range of roughly 2–12. Pushing generation into 10–12 (and, in some outputs, well beyond) moves the molecules outside the predictor's support, where its estimates are extrapolation. The generator is effectively finding inputs that fool the scoring function. This is a known failure mode of predictor-in-the-loop generative models and is why the PPB2 similarity check matters more than the pIC50 numbers.
+**Predicted pIC50 above roughly 12 is reward hacking, not chemistry.** The generator is optimised against the Phase I Random Forest, which was trained on a pIC50 range of roughly 2 to 12. Pushing generation into 10 to 12 (and, in some outputs, well beyond) moves the molecules outside the predictor's support, where its estimates are extrapolation. The generator is effectively finding inputs that fool the scoring function. This is a known failure mode of predictor-in-the-loop generative models, and it is why the PPB2 similarity check matters more than the pIC50 numbers.
 
 **Tanimoto 0.70 means structural resemblance, not activity.** A generated molecule scoring 0.70 against a known AChE inhibitor shares substructure with it. It has not been shown to bind anything.
 
 **No synthesisability filter.** Generated SMILES are not screened for synthetic accessibility, so some may be chemically valid but impractical to make.
 
-## Credit
+## 🙏 Credit
 
 The generator architecture, stack-augmented RNN implementation, and RL training loop come from [isayev/ReLeaSE](https://github.com/isayev/ReLeaSE) (MIT licence). The contribution here is the AChE-specific predictor, reward shaping, and validation pipeline.
 

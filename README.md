@@ -1,12 +1,12 @@
-# PharmAIcist — AI in the Discovery of Drugs
+# 🧬 PharmAIcist: AI in the Discovery of Drugs
 
-A three-stage machine learning pipeline for early-stage drug discovery in Alzheimer's disease, targeting the **acetylcholinesterase (AChE)** enzyme. Submitted as a B.E. final year project in Artificial Intelligence & Machine Learning at Dayananda Sagar College of Engineering (VTU), 2023–24.
+A three-stage machine learning pipeline for early-stage drug discovery in Alzheimer's disease, targeting the **acetylcholinesterase (AChE)** enzyme. Submitted as a B.E. final year project in Artificial Intelligence & Machine Learning at Dayananda Sagar College of Engineering (VTU), 2023-24.
 
-The pipeline goes from *screening known compounds* → *generating new ones* → *predicting whether they bind*. Each stage feeds the next.
+The pipeline goes from *screening known compounds*, to *generating new ones*, to *predicting whether they bind*. Each stage feeds the next.
 
 ---
 
-## Pipeline
+## 🔬 Pipeline
 
 ```
 ChEMBL (AChE, CHEMBL220)
@@ -26,7 +26,7 @@ ChEMBL (AChE, CHEMBL220)
          ▼
 ┌────────────────────────────┐
 │ Phase III                  │   Drug fingerprints + AlphaFold-derived protein
-│ Drug–Target Interaction    │──▶ sequence/structure embeddings → binding classifier
+│ Drug-Target Interaction    │──▶ sequence/structure embeddings → binding classifier
 └────────────────────────────┘
          │
          ▼
@@ -35,19 +35,21 @@ ChEMBL (AChE, CHEMBL220)
 
 ---
 
-## Phases
+## 📊 Phases
 
 | | Phase | What it does | Best model | Reported result |
 |---|---|---|---|---|
-| **I** | [Bioactivity & Toxicity](phase-1-bioactivity-toxicity/) | Predicts pIC50 potency and toxicity for compounds against AChE | Random Forest (bioactivity), Extra Trees (toxicity) | Test R² 0.649, train R² 0.943 |
-| **II** | [Molecule Generation](phase-2-molecule-generation/) | Generates novel drug-like SMILES optimised for potency and logP | Stacked GRU + RL (ReLeaSE) | 84% valid SMILES, Tanimoto 0.70 vs. PPB2 |
-| **III** | [Drug–Target Interaction](phase-3-drug-target-interaction/) | Predicts whether a drug–protein pair binds | Random Forest | 76% test accuracy, MCC 0.41 |
+| **I** | 🧪 [Bioactivity & Toxicity](phase-1-bioactivity-toxicity/) | Predicts pIC50 potency and toxicity for compounds against AChE | Random Forest (bioactivity), Extra Trees (toxicity) | Test R² 0.649, train R² 0.943 |
+| **II** | ⚗️ [Molecule Generation](phase-2-molecule-generation/) | Generates novel drug-like SMILES optimised for potency and logP | Stacked GRU + RL (ReLeaSE) | 84% valid SMILES, Tanimoto 0.70 vs. PPB2 |
+| **III** | 🔗 [Drug-Target Interaction](phase-3-drug-target-interaction/) | Predicts whether a drug-protein pair binds | Random Forest | 76% test accuracy, MCC 0.41 |
+
+📌 The Phase II work was published at ICICV 2024 (Springer LNNS), first author. Citation below.
 
 Each phase folder has its own README with setup, data sources, and how to run it.
 
 ---
 
-## Repository layout
+## 📁 Repository layout
 
 ```
 PharmAIcist/
@@ -61,7 +63,7 @@ PharmAIcist/
 
 ---
 
-## Data sources
+## 🗂️ Data sources
 
 | Source | Used in | Purpose |
 |---|---|---|
@@ -69,47 +71,42 @@ PharmAIcist/
 | [Tox21](https://tripod.nih.gov/tox21/) / TOXNET | I | Toxicity labels |
 | [PubChem](https://pubchem.ncbi.nlm.nih.gov/) | I, III | Molecular fingerprints (via PaDEL) |
 | [UniProt](https://www.uniprot.org/) | III | Protein sequences |
-| [AlphaFold DB](https://alphafold.ebi.ac.uk/) | III | Predicted 3D protein structures for embeddings |
+| [AlphaFold DB](https://alphafold.ebi.ac.uk/) | III | Predicted 3D structures for embeddings |
 | [PPB2](https://ppb2.gdb.tools/) | II | Validation of generated molecules |
 
-The Phase III dataset comprises roughly 163,000 curated drug–target interactions.
+The Phase III dataset comprises roughly 163,000 curated drug-target interactions.
 
 ---
 
-## Running the code
+## ⚙️ Running the code
 
-The three phases have **incompatible dependency sets** — Phase II needs PyTorch and an older RDKit, Phase III pins `scikit-learn==1.2.0` for model deserialisation. Use a separate environment per phase:
+The three phases have **incompatible dependency sets**. Phase II needs PyTorch and an older RDKit, while Phase III pins `scikit-learn==1.2.0` for model deserialisation. Use a separate environment per phase:
 
 ```bash
 conda create -n pharmaicist-p1 python=3.9 && conda activate pharmaicist-p1
 cd phase-1-bioactivity-toxicity && pip install -r requirements.txt
 ```
 
-Repeat with `-p2` / `-p3`. Per-phase instructions are in each folder's README.
+Repeat with `-p2` and `-p3`. Per-phase instructions live in each folder's README.
 
-**Large files.** Phase III ships several serialised datasets over 50 MB, tracked with Git LFS. Install LFS before cloning or those files arrive as text pointers:
-
-```bash
-git lfs install
-git clone https://github.com/<your-username>/PharmAIcist.git
-```
+📦 **Large files.** Phase III ships several serialised datasets over 50 MB. GitHub warns about these but they clone normally.
 
 ---
 
-## Notes and limitations
+## ⚠️ Notes and limitations
 
 Worth being upfront about, for anyone reading this as reference rather than as a finished tool:
 
-- **Phase I generalisation gap.** Train R² 0.943 vs. test R² 0.649 indicates the Random Forest overfits the fingerprint space. The 86% figure quoted in the report is a classification accuracy at the pIC50 > 6 activity threshold, not a regression score.
-- **Phase II pIC50 values are extrapolations.** The generator is rewarded by the Phase I predictor, so it learns to exploit that predictor's blind spots. Some generated molecules receive predicted pIC50 values well outside the range present in the training data (which spans roughly 2–12). These are not experimental measurements and should not be read as such. Tanimoto similarity against PPB2 peaks at 0.70, which is structural resemblance to known actives, not validated activity.
+- **Phase I generalisation gap.** Train R² 0.943 against test R² 0.649 indicates the Random Forest overfits the fingerprint space. The 86% figure quoted in the report is a classification accuracy at the pIC50 > 6 activity threshold, not a regression score.
+- **Phase II pIC50 values are extrapolations.** The generator is rewarded by the Phase I predictor, so it learns to exploit that predictor's blind spots. Some generated molecules receive predicted pIC50 values well outside the range present in the training data (roughly 2 to 12). These are not experimental measurements and should not be read as such. Tanimoto similarity against PPB2 peaks at 0.70, which is structural resemblance to known actives rather than validated activity.
 - **Phase III class balance.** The dummy classifier reaches 68% test accuracy, so the Random Forest's 76% is a modest lift over the majority baseline. MCC (0.41) is the more informative metric here.
 - **No wet-lab validation.** Every result is computational.
 
 ---
 
-## Publication
+## 📄 Publication
 
-The Phase II work was published as a Springer conference paper on generative molecule design using GRU architectures and reinforcement learning.
+The Phase II work was published at the International Conference on Innovations in Computational Intelligence and Computer Vision (ICICV 2024).
 
 > Satish, N., Bukapindi, M., K, S., Akhil, G., Malagi, V.P. (2024).
 > *Innovating Drug Design for Alzheimer's Disease via Reinforcement Learning for Enhanced Molecular Generation.*
@@ -120,7 +117,7 @@ The Phase II work was published as a Springer conference paper on generative mol
 
 ---
 
-## Authors
+## 👥 Authors
 
 B.E. Artificial Intelligence & Machine Learning, Dayananda Sagar College of Engineering, Bengaluru.
 
@@ -129,17 +126,17 @@ B.E. Artificial Intelligence & Machine Learning, Dayananda Sagar College of Engi
 - **Shreyas K** (1DS20AI052)
 - **Guru Akhil M** (1DS20AI031)
 
-Under the guidance of **Dr. Vindhya P Malagi**, Professor and Head, Department of AI & ML, DSCE.
+🎓 Under the guidance of **Dr. Vindhya P Malagi**, Professor and Head, Department of AI & ML, DSCE.
 
 This repository consolidates work originally developed across three separate repositories maintained by the team. The original repositories remain the historical record of contribution.
 
 ---
 
-## Third-party components
+## 📦 Third-party components
 
-- **[ReLeaSE](https://github.com/isayev/ReLeaSE)** (Popova, Isayev & Tropsha) — Phase II's generator architecture is built on this framework. MIT licence.
-- **[PaDEL-Descriptor](http://www.yapcwsoft.com/dd/padeldescriptor/)** (Yap, 2011) — vendored in Phase I for fingerprint calculation. Built on the CDK toolkit (LGPL).
+- **[ReLeaSE](https://github.com/isayev/ReLeaSE)** (Popova, Isayev & Tropsha). Phase II's generator architecture is built on this framework. MIT licence.
+- **[PaDEL-Descriptor](http://www.yapcwsoft.com/dd/padeldescriptor/)** (Yap, 2011), vendored in Phase I for fingerprint calculation. Built on the CDK toolkit (LGPL).
 
-## Licence
+## 📜 Licence
 
-MIT — see [LICENSE](LICENSE). Third-party components retain their own licences.
+MIT, see [LICENSE](LICENSE). Third-party components retain their own licences.

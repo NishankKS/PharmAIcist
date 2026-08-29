@@ -5,7 +5,12 @@ Generates novel drug-like molecules biased toward high predicted potency against
 Built on the **ReLeaSE** framework (Reinforcement Learning for Structural Evolution, Popova, Isayev & Tropsha, *Science Advances* 2018).
 
 > This phase was published as a Springer conference paper.
-> *(Add full citation and DOI here.)*
+> Satish, N., Bukapindi, M., K, S., Akhil, G., Malagi, V.P. (2024).
+> *Innovating Drug Design for Alzheimer's Disease via Reinforcement Learning for Enhanced Molecular Generation.*
+> In: Roy, S., Sinwar, D., Dey, N., Perumal, T., R. S. Tavares, J.M. (eds)
+> Innovations in Computational Intelligence and Computer Vision. ICICV 2024.
+> Lecture Notes in Networks and Systems, vol 1117. Springer, Singapore.
+> [https://doi.org/10.1007/978-981-97-6992-6_20](https://doi.org/10.1007/978-981-97-6992-6_20)
 
 ## How it works
 
